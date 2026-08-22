@@ -32,7 +32,7 @@
         ;; Generate the actual lambda with the right minimum arity
         ((%collect-args (shortest ...) (clauses ...))
          (lambda (shortest ... . rest)
-           (let ((len (length `((unquote shortest) ... . (unquote rest)))))
+           (let ((len (+ (length '(shortest ...)) (length rest))))
              (%case (shortest ... . rest) len 0 () clauses ...))))
         ;; Generate a lambda with a single rest argument
         ((%collect-args rest-arg (clauses ...))
