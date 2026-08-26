@@ -2368,12 +2368,22 @@
       (set! installed-files (cons o-path installed-files)))
     installed-files))
 
+(define (guile-srfi-fix dest-file)
+  ;; If library is (srfi N) it needs to be (srfi srfi-N) on Guile
+  (if (string-prefix? "srfi/" dest-file)
+    (string-append (string-copy dest-file 0 5)
+                   "srfi-"
+                   (string-copy dest-file 5))
+    dest-file))
+
 (define (guile-installer impl cfg library dir)
   (let* ((source-sld-file (get-library-file cfg library))
          (source-go-file (string-append
                           (library->path cfg library) ".go"))
-         (dest-sld-file (string-append (library->path cfg library) ".sld"))
-         (dest-go-file (string-append (library->path cfg library) ".go"))
+         (dest-sld-file
+           (guile-srfi-fix (string-append (library->path cfg library) ".sld")))
+         (dest-go-file
+           (guile-srfi-fix (string-append (library->path cfg library) ".go")))
          (include-files
           (library-include-files impl cfg (make-path dir source-sld-file)))
          (install-dir (get-install-source-dir impl cfg))
