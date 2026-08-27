@@ -98,9 +98,11 @@
              (res '()))
       (if (or (>= i n) (stream-null? strm))
           (reverse res)
-          (lp (+ i 1)
-              (stream-cdr strm)
-              (cons (stream-car strm) res))))))
+          (let ((res (cons (stream-car strm) res))
+                (i (+ i 1)))
+            (if (>= i n)
+                (reverse res)
+                (lp i (stream-cdr strm) res)))))))
 
 (define (stream-concat strms)
   (assert (stream? strms))
@@ -179,7 +181,7 @@
     (cond ((stream-null? strm) stream-null)
           ((pred? (stream-car strm))
            (stream-cons (stream-car strm) (filter (stream-cdr strm))))
-          (else not (filter (stream-cdr strm))))))
+          (else (filter (stream-cdr strm))))))
 
 (define (stream-for-each proc strm)
   (assert (procedure? proc) (stream? strm))
