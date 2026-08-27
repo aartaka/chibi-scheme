@@ -2633,7 +2633,7 @@ sexp sexp_read_string (sexp ctx, sexp in, int sentinel) {
           }
           c = sexp_unbox_fixnum(res);
 #if SEXP_USE_UTF8_STRINGS
-          if ((unsigned)c > 0x80) {
+          if ((unsigned)c >= 0x80) {
             len = sexp_utf8_char_byte_count(c);
             sexp_utf8_encode_char((unsigned char*)buf + i, len, c);
             i += len;
