@@ -99,7 +99,7 @@
           (cond
            ((pair? lseq1)
             (let ((val (lseq-car lseq1)))
-              (set! lseq1 (cdr lseq1))
+              (set! lseq1 (lseq-cdr lseq1))
               val))
            ((pair? ls)
             (set! lseq1 (car ls))
@@ -196,7 +196,7 @@
 
 (define (lseq-member elt lseq . o)
   (let* ((eq (if (pair? o) (car o) equal?))
-         (res (lseq-drop-while (lambda (x) (not (eq x elt))) lseq)))
+         (res (lseq-drop-while (lambda (x) (not (eq elt x))) lseq)))
     (and (pair? res) res)))
 
 (define (lseq-memq elt lseq) (lseq-member elt lseq eq?))

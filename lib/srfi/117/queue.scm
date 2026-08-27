@@ -72,6 +72,7 @@
           (cond
            ((null? (cdr tail))
             (set-cdr! head '())
+            (list-queue-last-set! list-queue head)
             (car tail))
            (else
             (lp tail (cdr tail))))))))
@@ -84,7 +85,7 @@
 
 (define (list-queue-set-list! list-queue list . o)
   (list-queue-list-set! list-queue list)
-  (list-queue-last-set! list-queue (if (pair? o) (car o) (last-pair list))))
+  (list-queue-last-set! list-queue (if (pair? o) (car o) (if (pair? list) (last-pair list) '()))))
 
 (define (list-queue-concatenate list-of-queues)
   (make-list-queue (list-copy (append-map list-queue-list list-of-queues))))
