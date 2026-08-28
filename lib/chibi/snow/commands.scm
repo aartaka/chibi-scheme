@@ -761,6 +761,8 @@
                         ((and (string-prefix? "git@" url) use-ssh-url?) url)
                         ((and (string-prefix? "ssh://" url) use-ssh-url?) url)
                         ((string-prefix? "git@" url) (git-url->https url))
+                        ((string-prefix? "ssh://git@" url)
+                         (git-url->https (string-copy url (string-length "ssh://"))))
                         ((and (string-prefix? "https://" url) use-ssh-url?)
                          (uri->string (uri-with-scheme (string->uri url) 'ssh)))
                         ((string-prefix? "https://" url) url)
