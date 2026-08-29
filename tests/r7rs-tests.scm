@@ -1024,6 +1024,8 @@
 (test 0 (expt 0 1))
 (test 1.0 (expt 0.0 0))
 (test 0.0 (expt 0 1.0))
+(test 1/1024 (expt 2 -10))
+(test 1/1180591620717411303424 (expt 2 -70))
 
 (test 1+2i (make-rectangular 1 2))
 
