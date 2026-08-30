@@ -47,7 +47,9 @@
       (test 0 (procedure-arity (case-lambda ((a b c) 1) (a 1))))
       (test 0 (procedure-arity (case-lambda (a 1) ((a b c) 1))))
 
-      ;; Test shortest arglist of 1 and 2
+      ;; Test shortest arglist of 0, 1, and 2
+      (test 0 (procedure-arity (case-lambda (() 1) ((a b) 1) ((a b c) 1))))
+      (test 0 (procedure-arity (case-lambda ((a b c) 1) (() 1) ((a b) 1))))
       (test 1 (procedure-arity (case-lambda ((a) 1) ((a b) 1) ((a b c) 1))))
       (test 1 (procedure-arity (case-lambda ((a) 1) ((a b c) 1) ((a b) 1))))
       (test 2 (procedure-arity (case-lambda ((a b) 1) ((a b c) 1))))
