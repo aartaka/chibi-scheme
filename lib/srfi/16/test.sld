@@ -55,4 +55,9 @@
       (test 2 (procedure-arity (case-lambda ((a b) 1) ((a b c) 1))))
       (test 2 (procedure-arity (case-lambda ((a b c) 1) ((a b) 1))))
 
+      ;; Minimal arity + rest
+      (test 2 (procedure-arity (case-lambda ((a b) 1) ((a b . c) 1))))
+      (test 2 (procedure-arity (case-lambda ((a b . c) 1) ((a b) 1))))
+      (test 0 (procedure-arity (case-lambda ((a b . c) 1) ((a b) 1) (x 1))))
+
       (test-end))))
