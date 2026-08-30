@@ -122,7 +122,8 @@
             (lambda (file)
               (let ((f (string-append file *shared-object-extension*)))
                 (cond ((find-module-file f) => (lambda (path) (load path env))))))
-            (cdar ls)))
+            (cdar ls))
+           (lp (cdr ls) res))
           ((begin body)
            (let lp2 ((ls2 (cdar ls)) (res res))
              (cond
@@ -139,7 +140,7 @@
   (let ((recursive? (and (pair? o) (car o)))
         (mod (load-module name)))
     (cond
-     ((not (module-ast mod))
+     ((or (not (module-ast mod)) (eq? (module-ast mod) (if #f #f)))
       (module-ast-set! mod '())       ; break cycles, just in case
       (module-ast-set! mod (analyze-module-source name mod recursive?))))
     mod))
