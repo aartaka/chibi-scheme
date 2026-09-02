@@ -26,6 +26,8 @@
          (%case-lambda (shortest ... (arg ...)) (args ...) clauses ...))
         ;; When ran out, generate a lambda with shortest args followed
         ;; by rest arg
+        ;; This (arg . _) is here because we need to “flatten” the
+        ;; nested list
         ((%case-lambda ((arg . _) ...) non-parsed-args clauses ...)
          (lambda (arg ... . rest)
            (let ((len (length `((unquote arg) ... . (unquote rest)))))
