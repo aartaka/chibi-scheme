@@ -742,6 +742,8 @@ sexp sexp_destroy_context (sexp ctx) {
 sexp sexp_make_exception (sexp ctx, sexp kind, sexp message, sexp irritants,
                           sexp procedure, sexp source) {
   sexp exn = sexp_alloc_type(ctx, exception, SEXP_EXCEPTION);
+  if (exn == sexp_global(ctx, SEXP_G_OOM_ERROR))
+    return exn;
   sexp_exception_kind(exn) = kind;
   sexp_exception_message(exn) = message;
   sexp_exception_irritants(exn) = irritants;
@@ -1417,14 +1419,16 @@ sexp sexp_make_string_op (sexp ctx, sexp self, sexp_sint_t n, sexp len, sexp ch)
 #else
   sexp_gc_preserve2(ctx, b, s);
   s = sexp_alloc_type(ctx, string, SEXP_STRING);
-  sexp_string_bytes(s) = b;
-  sexp_string_offset(s) = 0;
-  sexp_string_size(s) = sexp_bytes_length(b);
+  if (!sexp_exceptionp(s)) {
+    sexp_string_bytes(s) = b;
+    sexp_string_offset(s) = 0;
+    sexp_string_size(s) = sexp_bytes_length(b);
 #if SEXP_USE_STRING_REF_CACHE
-  sexp_cached_char_idx(s) = 0;
-  sexp_cached_cursor(s) = sexp_make_string_cursor(0);
+    sexp_cached_char_idx(s) = 0;
+    sexp_cached_cursor(s) = sexp_make_string_cursor(0);
 #endif
-  sexp_update_string_index_lookup(ctx, s);
+    sexp_update_string_index_lookup(ctx, s);
+  }
   sexp_gc_release2(ctx);
   return s;
 #endif
@@ -1478,11 +1482,13 @@ sexp sexp_subbytes_op (sexp ctx, sexp self, sexp_sint_t n, sexp vec, sexp start,
   str = sexp_c_string(ctx, sexp_bytes_data(vec), sexp_bytes_length(vec));
 #else
   str = sexp_alloc_type(ctx, string, SEXP_STRING);
-  sexp_string_bytes(str) = vec;
-  sexp_string_offset(str) = 0;
-  sexp_string_size(str) = sexp_bytes_length(vec);
+  if (!sexp_exceptionp(str)) {
+    sexp_string_bytes(str) = vec;
+    sexp_string_offset(str) = 0;
+    sexp_string_size(str) = sexp_bytes_length(vec);
+  }
 #endif
-  res = sexp_substring_op(ctx, self, n, str, sexp_fixnum_to_string_cursor(start), sexp_fixnum_to_string_cursor(end));
+  res = sexp_exceptionp(str) ? str : sexp_substring_op(ctx, self, n, str, sexp_fixnum_to_string_cursor(start), sexp_fixnum_to_string_cursor(end));
   if (!sexp_exceptionp(res))
     res = sexp_string_to_bytes(ctx, res);
   sexp_gc_release1(ctx);
@@ -2727,8 +2733,10 @@ sexp sexp_read_symbol (sexp ctx, sexp in, int init, int internp) {
 #if SEXP_USE_COMPLEX
 sexp sexp_make_complex (sexp ctx, sexp real, sexp image) {
   sexp res = sexp_alloc_type(ctx, complex, SEXP_COMPLEX);
-  sexp_complex_real(res) = real;
-  sexp_complex_imag(res) = image;
+  if (!sexp_exceptionp(res)) {
+    sexp_complex_real(res) = real;
+    sexp_complex_imag(res) = image;
+  }
   return res;
 }
 
@@ -2895,8 +2903,10 @@ sexp sexp_read_float_tail (sexp ctx, sexp in, double whole, int negp) {
 #if SEXP_USE_RATIOS
 sexp sexp_make_ratio (sexp ctx, sexp num, sexp den) {
   sexp res = sexp_alloc_type(ctx, ratio, SEXP_RATIO);
-  sexp_ratio_numerator(res) = num;
-  sexp_ratio_denominator(res) = den;
+  if (!sexp_exceptionp(res)) {
+    sexp_ratio_numerator(res) = num;
+    sexp_ratio_denominator(res) = den;
+  }
   return res;
 }
 
@@ -3537,7 +3547,7 @@ sexp sexp_read_raw (sexp ctx, sexp in, sexp *shares) {
           && sexp_opcodep(sexp_type_print(tmp))
           && sexp_opcode_func(sexp_type_print(tmp)) == (sexp_proc1)sexp_write_simple_object) {
         res = sexp_alloc_tagged(ctx, sexp_type_size_base(tmp), sexp_type_tag(tmp));
-        for (c1=0; ; c1++) {
+        for (c1=0; !sexp_exceptionp(res); c1++) {
           tmp2 = sexp_read_raw(ctx, in, shares);
           if (sexp_exceptionp(tmp2)) {
             res = tmp2;
