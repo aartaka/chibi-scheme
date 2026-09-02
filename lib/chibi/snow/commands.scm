@@ -751,6 +751,11 @@
       (when (not (string-suffix? ".tgz" pkg-file))
         (error "All packages must be .tgz files. Use snow-chibi package command")))
     pkg-files)
+    (when (> (string-count (process->string "git status -s") #\newline) 0)
+      (warn (string-append
+              "\"git status -s\" reports changes, are you sure files you are"
+              " indexing are commited into hash: "
+              (car (process->string-list "git rev-parse HEAD")) "?")))
   (let* ((repo-path git-repo-path)
          (dir (path-directory repo-path))
          (fix-git-url
