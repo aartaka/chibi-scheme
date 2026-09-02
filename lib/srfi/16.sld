@@ -30,7 +30,8 @@
         ;; nested list
         ((%case-lambda ((arg . _) ...) non-parsed-args clauses ...)
          (lambda (arg ... . rest)
-           (let ((len (length `((unquote arg) ... . (unquote rest)))))
+           (let ((len (+ (length '(arg ...))
+                         (length rest))))
              (%case (arg ... rest) len 0 () clauses ...))))))
     (define-syntax case-lambda
       (syntax-rules ()
