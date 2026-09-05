@@ -29,7 +29,7 @@
 (define-syntax check-arg
   (syntax-rules ()
     ((_ pred val caller)
-     (assert (pred val) val caller))
+     (assume (pred val) val caller))
     ((_ pred val)
      (check-arg pred val 'check-arg))))
 
@@ -52,9 +52,9 @@
      (cond
       (clause-check clause-body ...)
       ...
-      (else (assert (or clause-check ...)
-                    "at least one branch of check-case should be true"
-                    'clause-check ...))))
+      (else (assume (or clause-check ...)
+              "at least one branch of check-case should be true"
+              'clause-check ...))))
     ((_ val (clause ...) (pred body ...) rest ...)
      (%check-case
       val

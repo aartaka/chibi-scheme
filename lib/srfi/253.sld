@@ -2,9 +2,9 @@
   (import (scheme base)
           (scheme case-lambda)
           (scheme list)
-          (chibi assert)
           (chibi ast)
           (chibi generic))
+  (import (srfi 145))
   (export check-impl?
           check-arg values-checked
           check-case
